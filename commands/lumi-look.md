@@ -1,6 +1,6 @@
 ---
-description: Change how Lumi, the samajh.me firefly, looks (glass, buddy, professor, or original)
-argument-hint: <glass | buddy | professor | original | preview>
+description: Give Lumi, the samajh.me firefly, one fixed look for everyone (professor, glass, or original)
+argument-hint: <professor | glass | original | preview>
 ---
 Use the `lumi-looks` skill to change Lumi's look in the samajh.me code in this project to:
 

@@ -6,11 +6,11 @@
    Usage: node preview.mjs [out.html]      (default: ./lumi-looks-preview.html) */
 import fs from 'node:fs';
 import path from 'node:path';
-import {loadLooks, dataUri, flySVG, mascotSVG} from './apply-look.mjs';
+import {loadLooks, dataUri, layersOf, animCss, flySVG, mascotSVG} from './apply-look.mjs';
 
 const out = path.resolve(process.argv[2] || 'lumi-looks-preview.html');
 const cards = loadLooks().map(l => {
-  const uri = dataUri(l);
+  const uris = layersOf(l).map(L => dataUri(L.file)), uri = i => uris[i];
   const cell = cls => '<div class="cell ' + cls + '"><div class="vfly">' + flySVG(l, uri) + '</div><div class="mascot">' + mascotSVG(l, uri) + '</div></div>';
   return '<section><h2>' + l.name + ' <code>' + l.id + '</code></h2><p>' + l.description + '</p><div class="row">' + cell('light') + cell('dark') + '</div></section>';
 }).join('\n');
@@ -36,6 +36,7 @@ code{font-size:.8em;background:#e7e2d6;padding:2px 7px;border-radius:6px}
   .mascot .jm{transform-box:view-box;transform-origin:60px 60px;animation:jmFloat 5.5s ease-in-out infinite}
   .mascot .jm-halo{transform-box:view-box;transform-origin:60px 70px;animation:ffbreathe 3.4s ease-in-out infinite}
 }
+${animCss()}
 @keyframes ffbreathe{0%,100%{opacity:.62;transform:scale(.94)}50%{opacity:1;transform:scale(1.08)}}
 @keyframes ffdrift{0%{transform:translate(0,0) rotate(0deg)}25%{transform:translate(13px,-11px) rotate(4deg)}50%{transform:translate(-6px,-19px) rotate(-3deg)}75%{transform:translate(-14px,-6px) rotate(3deg)}100%{transform:translate(0,0) rotate(0deg)}}
 @keyframes jmFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}

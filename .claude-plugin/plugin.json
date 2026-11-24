@@ -1,5 +1,5 @@
 {
   "name": "lumi-looks",
-  "version": "0.1.0",
-  "description": "Change how Lumi (Jugnu), the firefly tutor of samajh.me, looks: three ready-made looks (glass, buddy, professor), applied to the site's code and undone with one command."
+  "version": "0.5.1",
+  "description": "Change how Lumi (Jugnu), the firefly tutor of samajh.me, looks: add a Settings card where students can swap the classic firefly for the Graduate or Glossy look and choose the colour of its light, or apply one fixed look. Both are undone with one command."
 }

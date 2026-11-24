@@ -4,8 +4,9 @@
    Samajh draws its firefly in two places, both inline SVG strings:
      - function fireflySVG()   the firefly that flies over the home screen
      - const JUGNU_MASCOT      the mascot beside sign-in and on the review screens
-   This script swaps both for a picture from ../looks, embedded as a data: URI
-   (the page loads no external images), and keeps the originals inside a marked
+   This script swaps both for one look from ../looks (a picture in layers, or a
+   drawing), put inside the page because the page loads no external images,
+   with the styles that make it move. It keeps the originals inside a marked
    block so `original` puts everything back exactly as it was.
 
    Usage
@@ -27,10 +28,39 @@ const END = '/* lumi-look:end */';
 export function loadLooks() {
   return JSON.parse(fs.readFileSync(path.join(LOOKS_DIR, 'looks.json'), 'utf8')).looks;
 }
-export function dataUri(look) {
-  const ext = path.extname(look.file).slice(1).toLowerCase();
+/* A drawn look's markup, without its outer <svg>. */
+export function vectorInner(look) {
+  const s = fs.readFileSync(path.join(LOOKS_DIR, look.file), 'utf8');
+  const a = s.indexOf('>', s.indexOf('<svg')) + 1, b = s.lastIndexOf('</svg>');
+  if (a <= 0 || b < 0) throw new Error(look.file + ' is not an SVG file.');
+  return s.slice(a, b).replace(/>\s+</g, '><').trim();
+}
+/* How the drawn looks move, as one line of CSS. */
+export function animCss() {
+  return fs.readFileSync(path.join(HERE, '..', 'customizer', 'anim.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ').replace(/\s*([{};:,])\s*/g, '$1').trim();
+}
+/* A picture's layers, back to front: {file, mask, x, y, w, h} in the picture's own pixels, and for a
+   layer that moves, `class`, `origin` and `vars`. A picture in one file is one layer its own size. */
+export function layersOf(look) {
+  if (look.vector) return [];
+  return look.layers || [{file: look.file, mask: look.mask, x: 0, y: 0, w: look.width, h: look.height}];
+}
+/* The look at a place. A drawing: its own markup, scaled, with ids of its own. A picture: one <image>
+   per layer, the moving ones in a group that carries their motion. `href(i)` gives layer i's address. */
+function picture(look, href, x, y, w, h, idp) {
+  const s = w / look.width, f = n => +n.toFixed(2);
+  if (look.vector) return '<g transform="translate(' + f(x) + ' ' + f(y) + ') scale(' + +s.toFixed(4) + ')">' +
+    vectorInner(look).replace(/id="/g, 'id="' + idp).replace(/url\(#/g, 'url(#' + idp) + '</g>';
+  return layersOf(look).map((L, i) => {
+    const im = '<image href="' + href(i) + '" x="' + f(x + L.x * s) + '" y="' + f(y + L.y * s) + '" width="' + f(L.w * s) + '" height="' + f(L.h * s) + '"/>';
+    return L.class ? '<g class="' + L.class + '" style="transform-origin:' + L.origin + (L.vars ? ';' + L.vars : '') + '">' + im + '</g>' : im;
+  }).join('');
+}
+export function dataUri(file) {
+  if (file && file.file) file = file.file;
+  const ext = path.extname(file).slice(1).toLowerCase();
   const mime = ext === 'jpg' ? 'jpeg' : ext;
-  return 'data:image/' + mime + ';base64,' + fs.readFileSync(path.join(LOOKS_DIR, look.file)).toString('base64');
+  return 'data:image/' + mime + ';base64,' + fs.readFileSync(path.join(LOOKS_DIR, file)).toString('base64');
 }
 
 /* Where the picture goes. Both drawings pulse their glow around (60,70): the
@@ -52,7 +82,7 @@ const GLOW = id =>
 /* The flying firefly: same viewBox and classes as the original, so the drift
    (.ffbody) and the breathing lantern (.ffhalo, .fflamp) keep working. */
 export function flySVG(look, href) {
-  const p = place(look, {x0: -8, x1: 128, y0: -16, y1: 128}, 104);
+  const p = place(look, {x0: -8, x1: 128, y0: 16, y1: 128}, 104);
   return '<svg class="ffly" viewBox="0 0 120 130" aria-hidden="true">' +
     '<defs><radialGradient id="ffg" cx="50%" cy="54%" r="50%">' +
     '<stop offset="0" stop-color="#FFF6D2" stop-opacity=".95"/>' +
@@ -61,7 +91,7 @@ export function flySVG(look, href) {
     '</radialGradient>' + GLOW('ffl') + '</defs>' +
     '<g class="ffbody">' +
     '<circle class="ffhalo" cx="60" cy="70" r="46" fill="url(#ffg)"/>' +
-    '<image href="' + href + '" x="' + p.x + '" y="' + p.y + '" width="' + p.w + '" height="' + p.h + '"/>' +
+    '<g class="llean">' + picture(look, href, p.x, p.y, p.w, p.h, 'lf') + '</g>' +
     '<circle class="fflamp" cx="60" cy="70" r="' + p.r + '" fill="url(#ffl)"/>' +
     '</g></svg>';
 }
@@ -81,7 +111,7 @@ export function mascotSVG(look, href) {
     '<stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/></radialGradient></defs>' +
     '<g class="jm">' +
     '<g transform="translate(' + f(lx - 60) + ' ' + f(ly - 70) + ')"><circle class="jm-halo" cx="60" cy="70" r="' + f(r) + '" fill="url(#jmHalo)"/></g>' +
-    '<image href="' + href + '" x="' + f(x) + '" y="' + f(y) + '" width="' + f(w) + '" height="' + f(h) + '"/>' +
+    picture(look, href, x, y, w, h, 'lm') +
     '</g></svg>';
 }
 
@@ -112,11 +142,14 @@ function endOf(src, from, kind) {
 }
 const jsStr = s => "'" + s.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
 
+/* In the page the pictures are kept once, in LUMI_LOOK_IMG; the markup points at them by number. */
+const SLOT = i => '\u0000' + i + '\u0001', SLOTS = /\u0000(\d+)\u0001/g;
+
 const TARGETS = [
   {key: 'fly', head: 'function fireflySVG(){', kind: 'function', name: 'fireflySVG', spare: 'fireflySVG__original',
-    make: (look) => 'function fireflySVG(){\n  return ' + jsStr(flySVG(look, '\u0000')).replace('\u0000', "'+LUMI_LOOK_IMG+'") + ';\n}'},
+    make: (look) => 'function fireflySVG(){\n  return ' + jsStr(flySVG(look, SLOT)).replace(SLOTS, "'+LUMI_LOOK_IMG[$1]+'") + ';\n}'},
   {key: 'mascot', head: 'const JUGNU_MASCOT=', kind: 'const', name: 'JUGNU_MASCOT', spare: 'JUGNU_MASCOT__original',
-    make: (look) => 'const JUGNU_MASCOT=' + jsStr(mascotSVG(look, '\u0000')).replace('\u0000', "'+LUMI_LOOK_IMG+'") + ';'},
+    make: (look) => 'const JUGNU_MASCOT=' + jsStr(mascotSVG(look, SLOT)).replace(SLOTS, "'+LUMI_LOOK_IMG[$1]+'") + ';'},
 ];
 
 /* Take every managed block out and put the original statement back. */
@@ -151,7 +184,10 @@ export function apply(src, look) {
     const orig = clean.slice(at, end).replace(t.name, t.spare);
     const block =
       START + ' ' + look.id + ' — drawn by the lumi-looks plugin; `apply-look.mjs original` undoes it */\n' +
-      (t.key === first ? 'const LUMI_LOOK_IMG=' + jsStr(dataUri(look)) + ';\n' : '') +
+      (t.key === first
+        ? "(function(){const s=document.createElement('style');s.textContent=" + jsStr(animCss()) + ";document.head.appendChild(s);})();\n" +
+          'const LUMI_LOOK_IMG=[' + layersOf(look).map(L => jsStr(dataUri(L.file))).join(',') + '];\n'
+        : '') +
       '/* lumi-look:original */\n' + orig + '\n/* lumi-look:new */\n' + t.make(look) + '\n' + END;
     out = out.slice(0, at) + block + out.slice(end);
   }
@@ -183,8 +219,8 @@ function main() {
   const looks = loadLooks();
   if (flag('--list') || !argv.length) {
     console.log('Looks:');
-    for (const l of looks) console.log('  ' + l.id.padEnd(11) + l.description);
-    console.log('  ' + 'original'.padEnd(11) + "Samajh's own drawing (undoes a look).");
+    for (const l of looks) console.log('  ' + l.id.padEnd(17) + l.description);
+    console.log('  ' + 'original'.padEnd(17) + "Samajh's own drawing (undoes a look).");
     return;
   }
   let files = opt('--file') ? [path.resolve(opt('--file'))] : findPages(path.resolve(opt('--site') || '.'));

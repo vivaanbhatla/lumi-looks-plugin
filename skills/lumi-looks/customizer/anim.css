@@ -1,0 +1,39 @@
+/* Where the firefly sits among the page's layers, and how the fireflies move. Wings (.lw) beat fast while flying and slowly beside
+   a form; a picture's wings (.lwp) are bigger, so they beat a little slower.
+   Each wing says how far it swings and how it flattens with --r0, --r1, --sx
+   and --sy on its own group. .lsway, .lwave and .ltw are a scarf or tassel
+   swinging, an arm waving and feelers twitching; .llean tips the firefly into
+   each leg of its flight across the home screen (the times match the site's
+   ffroam). Nothing moves in the Settings thumbnails or under reduced motion. */
+/* Layering. The site puts the firefly above the whole page (z-index 2, over
+   .shell at 1). The user asked for it never to cover the words, so it goes
+   under the page instead: it still shows over the paper, and text, the
+   question box and everything else on the page are drawn on top of it.
+   The id is written twice so this outranks the site's own #jugnu rule, which
+   comes later in the page (its stylesheet is in the body, ours in the head). */
+#jugnu#jugnu{z-index:0}
+.lw,.lsway,.lwave,.ltw,.llean{transform-box:fill-box}
+.llean{transform-origin:50% 62%}
+@media (prefers-reduced-motion:no-preference){
+  .vfly .lw{animation:lwflap .13s ease-in-out infinite alternate}
+  .vfly.listen .lw{animation-duration:.09s}
+  .vfly.think .lw{animation-duration:.3s}
+  .vfly.talk .lw{animation-duration:.08s}
+  .vfly .lwp{animation-duration:.19s}
+  .vfly.listen .lwp{animation-duration:.13s}
+  .vfly.think .lwp{animation-duration:.42s}
+  .vfly.talk .lwp{animation-duration:.12s}
+  .mascot .lw{animation:lwsoft 1.9s ease-in-out infinite alternate}
+  .vfly .lsway,.mascot .lsway{animation:lwsway 1.7s ease-in-out infinite alternate}
+  .vfly .lwave,.mascot .lwave{animation:lwwave .7s ease-in-out infinite alternate}
+  .vfly .ltw,.mascot .ltw{animation:lwtw 2.3s ease-in-out infinite alternate}
+  .vfly .lspark,.mascot .lspark{animation:lwspark 1.6s ease-in-out infinite alternate}
+  #jugnu.desk .llean{animation:lwlean 46s ease-in-out infinite}
+}
+@keyframes lwflap{from{transform:rotate(var(--r0,7deg)) scale(1)}to{transform:rotate(var(--r1,-9deg)) scale(var(--sx,1),var(--sy,.42))}}
+@keyframes lwsoft{from{transform:rotate(calc(var(--r0,7deg)*.45))}to{transform:rotate(calc(var(--r1,-9deg)*.55))}}
+@keyframes lwsway{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+@keyframes lwwave{from{transform:rotate(8deg)}to{transform:rotate(-16deg)}}
+@keyframes lwtw{from{transform:rotate(-3deg)}to{transform:rotate(4deg)}}
+@keyframes lwspark{from{opacity:.6}to{opacity:1}}
+@keyframes lwlean{0%{transform:rotate(0)}6%{transform:rotate(7deg)}12%,26%{transform:rotate(0)}32%{transform:rotate(7deg)}38%{transform:rotate(0)}44%{transform:rotate(-7deg)}50%,66%{transform:rotate(0)}72%{transform:rotate(4deg)}78%{transform:rotate(0)}84%{transform:rotate(-8deg)}90%,100%{transform:rotate(0)}}

@@ -1,42 +1,71 @@
 {
   "looks": [
     {
-      "id": "glass",
-      "name": "Glass",
-      "description": "A glossy, lifelike 3D firefly in flight.",
-      "file": "glass.webp",
-      "width": 512,
-      "height": 486,
-      "lamp": {
-        "x": 0.373,
-        "y": 0.683,
-        "r": 0.084
-      }
-    },
-    {
-      "id": "buddy",
-      "name": "Buddy",
-      "description": "A round, smiling 3D firefly facing you.",
-      "file": "buddy.webp",
-      "width": 432,
-      "height": 512,
-      "lamp": {
-        "x": 0.471,
-        "y": 0.726,
-        "r": 0.098
-      }
-    },
-    {
       "id": "professor",
-      "name": "Professor",
-      "description": "A flat cartoon firefly in a graduation cap and gown, with a book and a pointer.",
-      "file": "professor.webp",
-      "width": 488,
+      "name": "Graduate",
+      "description": "A flat cartoon firefly in a graduation cap and gown, with a book and a pointer. Its wings and tassel move.",
+      "width": 489,
       "height": 512,
       "lamp": {
-        "x": 0.382,
-        "y": 0.796,
+        "x": 0.381,
+        "y": 0.795,
         "r": 0.082
+      },
+      "layers": [
+        {
+          "file": "professor.wingl.webp",
+          "x": 0,
+          "y": 142,
+          "w": 215,
+          "h": 236,
+          "mask": "professor.wingl.mask.webp",
+          "class": "lw lwp",
+          "origin": "86.1% 55.8%",
+          "vars": "--r0:4deg;--r1:-5deg;--sx:1;--sy:.84"
+        },
+        {
+          "file": "professor.wingr.webp",
+          "x": 278,
+          "y": 199,
+          "w": 142,
+          "h": 113,
+          "mask": "professor.wingr.mask.webp",
+          "class": "lw lwp",
+          "origin": "14.5% 53.9%",
+          "vars": "--r0:-4deg;--r1:5deg;--sx:1;--sy:.86"
+        },
+        {
+          "file": "professor.base.webp",
+          "x": 0,
+          "y": 0,
+          "w": 489,
+          "h": 512,
+          "mask": "professor.base.mask.webp"
+        },
+        {
+          "file": "professor.tassel.webp",
+          "x": 143,
+          "y": 120,
+          "w": 39,
+          "h": 66,
+          "mask": "professor.tassel.mask.webp",
+          "class": "lsway",
+          "origin": "39.2% 11.9%"
+        }
+      ]
+    },
+    {
+      "id": "glass",
+      "name": "Glossy",
+      "description": "A flat cartoon firefly seen from above, in flight, with no face. Its wings beat and its feelers twitch.",
+      "file": "glossy.svg",
+      "vector": true,
+      "width": 261.5,
+      "height": 229.6,
+      "lamp": {
+        "x": 0.409,
+        "y": 0.713,
+        "r": 0.042
       }
     }
   ]
