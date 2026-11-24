@@ -1,0 +1,43 @@
+{
+  "looks": [
+    {
+      "id": "glass",
+      "name": "Glass",
+      "description": "A glossy, lifelike 3D firefly in flight.",
+      "file": "glass.webp",
+      "width": 512,
+      "height": 486,
+      "lamp": {
+        "x": 0.373,
+        "y": 0.683,
+        "r": 0.084
+      }
+    },
+    {
+      "id": "buddy",
+      "name": "Buddy",
+      "description": "A round, smiling 3D firefly facing you.",
+      "file": "buddy.webp",
+      "width": 432,
+      "height": 512,
+      "lamp": {
+        "x": 0.471,
+        "y": 0.726,
+        "r": 0.098
+      }
+    },
+    {
+      "id": "professor",
+      "name": "Professor",
+      "description": "A flat cartoon firefly in a graduation cap and gown, with a book and a pointer.",
+      "file": "professor.webp",
+      "width": 488,
+      "height": 512,
+      "lamp": {
+        "x": 0.382,
+        "y": 0.796,
+        "r": 0.082
+      }
+    }
+  ]
+}

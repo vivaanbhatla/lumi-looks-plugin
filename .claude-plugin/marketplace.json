@@ -1,0 +1,5 @@
+{
+  "name": "lumi-looks-plugin",
+  "owner": { "name": "vivaanbhatla" },
+  "plugins": [{ "name": "lumi-looks", "source": "./" }]
+}
